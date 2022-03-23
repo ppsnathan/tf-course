@@ -1,6 +1,6 @@
 variable "DO_token" {
     description = "Access token"
-    type =string
+    type = string
     sensitive = true
   
 }
@@ -27,4 +27,10 @@ variable droplet_image {
 variable droplet_region {
     type = string
     default = "sgp1"
+}
+
+variable "code_server_password" {
+    description = "code server password"
+    type = string
+    sensitive = true
 }
