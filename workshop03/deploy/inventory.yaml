@@ -1,0 +1,9 @@
+all:
+  hosts:
+    nginx:
+       ansible_host: 128.199.115.90
+       ansible_user: root 
+       ansible_ssh_private_key_file: ~/.ssh/my-key.pem
+       code_server_password: MAGA
+       code_server_name: code-128.199.115.90.nip.io
+

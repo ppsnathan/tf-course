@@ -1,0 +1,60 @@
+- name: Download and install code Server
+  hosts: nginx
+
+  tasks:
+  
+  - name: Generate code-server.service file
+    template:
+      src: code-server.service.j2
+      dest: /lib/systemd/system/code-server.service
+
+  - name: Start and enable code-server.service
+    systemd:
+      name: code-server
+      daemon_reload: true
+      enabled: true
+      state: restarted
+
+  - name: ensure nginx is at the latest version
+    apt: 
+      name: nginx 
+      state: present
+      
+  - name: start nginx
+    service:
+        name: nginx
+        state: started
+
+  - name: Setup nginx vhost
+    template:
+      src: code-server.conf.j2
+      dest: /etc/nginx/sites-available/code-server.conf
+ 
+  - name: Create a symbolic link 
+    file:
+      src: /etc/nginx/sites-available/code-server.conf
+      dest: /etc/nginx/sites-enabled/code-server.conf
+      owner: root
+      group: root
+      state: link
+
+
+  - name: restart nginx
+    service:
+      name: nginx
+      state: restarted
+
+  # - name: Setup nginx conf
+  #   template:
+  #     src: nginx.conf.tpl
+  #     dest: {{ nginx_path }}/nginx.conf
+  #   notify: restart nginx
+  #   handlers:
+  #   - name: restart nginx
+  #     service:
+  #       name: nginx
+  #       state: restarted
+
+  - name: Debug
+    debug:
+      msg: Ip addr is {{ ansible_host }}

@@ -1,0 +1,37 @@
+- name: Connectivity Test
+  hosts: all
+  vars:
+    mylist:
+    - one
+    - two
+    - three
+
+  tasks:
+  - name: Ping Server
+    ping:
+
+  - name: Debug
+    debug:
+      msg: Ip addr is {{ ansible_host }}
+
+  - name: List all lines
+    debug:
+      msg: "Lines: {{ item }}"
+    loop:
+    - line 1
+    - line 2
+
+  - name: list variable
+    debug:
+      msg: "My vars: {{ item }}"
+    loop: "{{ mylist }}"
+
+  - name: Find files under /etc
+    find:
+      paths: /etc
+      file_type: file
+    register: etc_files
+
+  - name: List etc_files outputs
+    debug:
+      msg: " >>>> {{ item.path }}"

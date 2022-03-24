@@ -1,0 +1,95 @@
+- name: Download and install code Server
+  hosts: default
+  become: true
+
+  tasks:
+  - name: Create a directory if it does not exist
+    file:
+      path: "{{ item }}"
+      state: directory
+      mode: '0755'
+    loop:
+      - /root/code-server
+      - /usr/lib/code-server
+
+  - name: Check if the file tarball exists
+    stat:
+      path: /root/code-server/code-server-4.2.0-linux-amd64
+    register: cs_tarball
+
+  - name: Download and extract tarball
+    unarchive:
+      src: https://github.com/coder/code-server/releases/download/v4.2.0/code-server-4.2.0-linux-amd64.tar.gz
+      dest: /root/code-server
+      remote_src: yes
+    when: not cs_tarball.stat.exists 
+
+  - name: Ansible copy files remote to remote
+    copy:
+      src: /root/code-server/code-server-4.2.0-linux-amd64/
+      dest: /usr/lib/code-server
+      remote_src: yes
+
+  - name: Create a symbolic link 
+    file:
+      src: /usr/lib/code-server/bin/code-server
+      dest: /usr/bin/code-server
+      owner: root
+      group: root
+      state: link
+
+  # - name: Generate code-server.service file
+  #   template:
+  #     src: code-server.service.j2
+  #     dest: /lib/systemd/system/code-server.service
+
+  # - name: Start and enable code-server.service
+  #   systemd:
+  #     name: code-server
+  #     daemon_reload: true
+  #     enabled: true
+  #     state: restarted
+
+  - name: ensure nginx is at the latest version
+    apt: 
+      name: nginx 
+      state: present
+      
+  # - name: start nginx
+  #   service:
+  #       name: nginx
+  #       state: started
+
+  # - name: Setup nginx vhost
+  #   template:
+  #     src: code-server.conf.j2
+  #     dest: /etc/nginx/sites-available/code-server.conf
+ 
+  # - name: Create a symbolic link 
+  #   file:
+  #     src: /etc/nginx/sites-available/code-server.conf
+  #     dest: /etc/nginx/sites-enabled/code-server.conf
+  #     owner: root
+  #     group: root
+  #     state: link
+
+
+  # - name: restart nginx
+  #   service:
+  #     name: nginx
+  #     state: restarted
+
+#   - name: Setup nginx conf
+#     template:
+#       src=nginx.conf.tpl
+#       dest={{ nginx_path }}/nginx.conf
+#     notify: restart nginx
+# handlers:
+#   - name: restart nginx
+#     service:
+#       name=nginx
+#       state=restarted
+
+  - name: Debug
+    debug:
+      msg: Ip addr is {{ ansible_host }}
